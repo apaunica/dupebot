@@ -1,3 +1,5 @@
+console.log("🔔 Incoming Slack event:", req.body);
+
 const express = require("express");
 const router = express.Router();
 const { searchJira } = require("../services/jira");
