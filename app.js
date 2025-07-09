@@ -9,6 +9,12 @@ const PORT = process.env.PORT || 3000;
 app.use(bodyParser.json());
 app.use("/slack/events", slackRoutes);
 
+app.post("/", (req, res) => {
+  console.log("🔥 Test endpoint hit!", req.body);
+  res.sendStatus(200);
+});
+
+
 app.listen(PORT, () => {
   console.log(`⚡ DupeBot is live on port ${PORT}`);
 });
