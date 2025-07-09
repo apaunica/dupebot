@@ -1,29 +1,31 @@
 const fetch = require("node-fetch");
 
 async function extractKeywords(text) {
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
+  const prompt = `Extract key terms from this bug report to help search for duplicates:\n\n"${text}"\n\nOnly return key terms, comma-separated.`;
+
+  const response = await fetch("https://api.openai.com/v1/completions", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
     },
     body: JSON.stringify({
-      model: "gpt-3.5-turbo",
-      messages: [
-        {
-          role: "system",
-          content: "Extract clean, searchable keywords from the bug description. Be concise."
-        },
-        {
-          role: "user",
-          content: text
-        }
-      ]
+      model: "text-davinci-003",
+      prompt,
+      max_tokens: 60,
+      temperature: 0.5,
     })
   });
 
   const data = await response.json();
-  return data.choices[0].message.content.trim();
+
+  if (!data.choices || !data.choices[0]?.text) {
+    console.error("❌ OpenAI response error:", data);
+    throw new Error("OpenAI failed to return expected output");
+  }
+
+  const rawKeywords = data.choices[0].text;
+  return rawKeywords.split(",").map(k => k.trim()).filter(Boolean);
 }
 
 module.exports = { extractKeywords };
