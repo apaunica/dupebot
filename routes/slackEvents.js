@@ -1,5 +1,3 @@
-console.log("🔔 Incoming Slack event:", req.body);
-
 const express = require("express");
 const router = express.Router();
 const { searchJira } = require("../services/jira");
@@ -8,6 +6,8 @@ const { postSearchResults } = require("../services/slack");
 
 router.post("/", async (req, res) => {
   const { type, challenge, event } = req.body;
+
+  console.log("🔔 Incoming Slack event:", req.body); // <-- this is now inside the route
 
   if (type === "url_verification") {
     return res.send({ challenge });
